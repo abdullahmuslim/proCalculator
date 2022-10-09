@@ -1,0 +1,271 @@
+body{
+  height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+p{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#unit{
+  color: #555;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: .5em;
+  width: 10vw;
+}
+nav{
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 0.5em;
+  width: 2em;
+}
+#display{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: right;
+}
+#calculation{
+  color: #222;
+  position: fixed;
+  top: 8vh;
+  right: 0;
+  text-align: right;
+  font-weight: 300;
+  width: auto;
+  max-height: 1em;
+  padding: 4vw;
+  font-size: 5vw;
+}
+#calculation *{
+  display: inline;
+}
+#result{
+  color: #555;
+  position: fixed;
+  top: 23vh;
+  right: 0;
+  text-align: right;
+  font-size: 2.5vw;
+  padding: 4vw;
+  width: auto;
+}
+#interface{
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: grid;
+  grid-template-rows: 0.4fr 0.6fr;
+  height: 100vh;
+  width: 100vw;
+}
+#display{
+  width: 100vw;
+  height: 40vh;
+}
+#buttons{
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1.5fr;
+  height: 60vh;
+  margin: 0;
+  user-select: none;
+}
+#buttonTrans{
+  position: fixed;
+  top: 40vh;
+  left: -21vw;
+  width: 20vw;
+  height: 60vh;
+  background: rgba(0, 0, 0, 0.8);
+}
+#swipeNotify{
+  z-index: 1;
+  position: fixed;
+  top: 40vh;
+  right: -1vw;
+  font-size: 1vw;
+  width: 1vw;
+}
+#buttons p{
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+  font-size: 2.5vw;
+}
+sup{
+  font-size: 1.7vw;
+}
+#nums{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  gap: 0;
+  grid-template-areas: 'seven eight nine division del'
+  'four five six mult .'
+  'one two three subt .'
+  'point zero . plus equal';
+  width: 62.5vw;
+}
+#nums > p, #signs > p, #additionalSigns > p{
+  display: flex;
+  background: #d88;
+  padding: auto;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+#nums > p:nth-child(1){
+  grid-area: seven;
+  background: #;
+}
+#nums > p:nth-child(2){
+  grid-area: eight;
+  background: #;
+}
+#nums > p:nth-child(3){
+  grid-area: nine;
+  background: #;
+}
+#nums > p:nth-child(4){
+  grid-area: division;
+  background: #;
+}
+#nums > p:nth-child(5){
+  grid-area: del;
+  background: #;
+}
+#nums > p:nth-child(6){
+  grid-area: four;
+  background: #;
+}
+#nums > p:nth-child(7){
+  grid-area: five;
+  background: #;
+}
+#nums > p:nth-child(8){
+  grid-area: six;
+  background: #;
+}
+#nums > p:nth-child(9){
+  grid-area: mult;
+  background: #;
+}
+#nums > p:nth-child(10){
+  grid-area: one;
+  background: #;
+}
+#nums > p:nth-child(11){
+  grid-area: two;
+  background: #;
+}
+#nums > p:nth-child(12){
+  grid-area: three;
+  background: #;
+}
+#nums > p:nth-child(13){
+  grid-area: subt;
+  background: #;
+}
+#nums > p:nth-child(14){
+  grid-area: point;
+  background: #;
+}
+#nums > p:nth-child(15){
+  grid-area: zero;
+  background: #;
+}
+
+#nums > p:nth-child(16){
+  grid-area: plus;
+  background: #;
+}
+#nums > p:nth-child(17){
+  grid-area: equal;
+  background: #;
+}
+#signs, #additionalSigns{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  width: 37.5vw;
+  height: 60vh;
+  background: #f3f;
+}
+
+@keyframes swiper{
+  0%{transform: translate(-3vw, 0);};
+  33.3%{transform: translate(-3vw, 0);};
+  66.7%{transform: translate(-3vw, 0);};
+  100%{transform: translate(9vw, 0);};
+}
+@media only screen and (max-width:540px){
+  #calculation{
+    font-size: 20vw;
+    font-weight: 300;
+  }
+  #calculation sup{
+    font-size: 10vw;
+  }
+  #result{
+    font-size: 10vw;
+  }
+  #buttonTrans{
+    left: -21vw;
+  }
+  #buttons{
+    grid-template-columns: 6.5fr 4.5fr;
+  }
+  #swipeNotify{
+    right: 0;
+    padding: 2vw;
+    animation: swiper 0.7s linear infinite;
+  }
+  #buttons p{
+    font-size: 8vw;
+  }
+  sup{
+    font-size: 4vw;
+  }
+  .aNum{
+    display: flex;
+    font-size: 11vw;
+  }
+  #nums{
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-areas: 'seven eight nine del'
+    'seven eight nine del'
+    'seven eight nine del'
+    'seven eight nine del'
+    'seven eight nine division'
+    'four five six division'
+    'four five six division'
+    'four five six division'
+    'four five six mult'
+    'four five six mult'
+    'one two three mult'
+    'one two three mult'
+    'one two three subt'
+    'one two three subt'
+    'one two three subt'
+    'point zero equal subt'
+    'point zero equal plus'
+    'point zero equal plus'
+    'point zero equal plus'
+    'point zero equal plus';
+    width: 90vw;
+  }
+  #signs, #additionalSigns{
+    height: 60vh;
+    width: 70vw;
+    padding-left: 10vw;
+  }
+  #additionalSigns{
+    display: none;
+  }
+}
