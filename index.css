@@ -31,13 +31,15 @@ nav{
   align-items: right;
 }
 #calculation{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   color: #222;
   position: fixed;
   top: 8vh;
   right: 0;
   text-align: right;
   font-weight: 300;
-  width: auto;
   max-height: 1em;
   padding: 4vw;
   font-size: 5vw;

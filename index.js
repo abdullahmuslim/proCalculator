@@ -1,11 +1,14 @@
 let resizeTime = 0;
+let signs = "÷×+–^";
 let portrait;
+let navHiding;
 if(window.screen.availWidth < 540){
   portrait = true;
 }else{
   portrait = false;
 }
 window.onload = function() {
+  navHiding = setTimeout(hideNavs, 2000);
   let inv = document.getElementsByClassName("inv");
   for (let i = 0;
   i < inv.length; i++) {
@@ -26,15 +29,31 @@ window.onload = function() {
   let nums = document.getElementById("nums");
   for (let i = 0; i < nums.children.length; i++){
     nums.children[i].addEventListener("click", inputNums);
+    nums.children[i].addEventListener("click", normalizeDel);
+    nums.children[i].addEventListener("click", gradualResult);
   }
+  let del = document.getElementById("del");
+  del.removeEventListener("click", inputNums);
+  del.removeEventListener("click",normalizeDel)
+  del.addEventListener("click", logicalDelete);
+  let equal = document.getElementById("equal");
+  equal.removeEventListener("click", inputNums);
+  equal.removeEventListener("click", normalizeDel);
+  equal.addEventListener("click", answer);
   signs = document.getElementById("signs");
   for (let i = 0; i < signs.children.length; i++){
     signs.children[i].addEventListener("click", inputSigns);
+    signs.children[i].addEventListener("click", normalizeDel);
+    signs.children[i].addEventListener("click", gradualResult);
   }
-  additionalSigns = document.getElementById("additionalSigns");
+  let additionalSigns = document.getElementById("additionalSigns");
   for (let i = 0; i < additionalSigns.children.length; i++){
     additionalSigns.children[i].addEventListener("click", inputAdditionalSigns);
+    additionalSigns.children[i].addEventListener("click", normalizeDel);
+    additionalSigns.children[i].addEventListener("click", gradualResult);
   }
+  let display = document.getElementById("display");
+  display.addEventListener("click", showNavs)
 }
 window.onresize = function() {
   if(window.screen.availWidth > 540){
@@ -56,13 +75,33 @@ window.onresize = function() {
     }
   }
 }
+function showNavs(){
+  clearTimeout(navHiding);
+  let nav = document.getElementsByTagName("nav")[0];
+  let unit = document.getElementById("unit");
+  let display = window.getComputedStyle(nav).getPropertyValue("display");
+  let flex = (display !== "flex")? true : false;
+  if(flex){
+    nav.style.display = "flex";
+    unit.style.display = "flex";
+    navHiding = setTimeout(hideNavs, 2000);
+  }else{
+    hideNavs();
+  }
+}
+function hideNavs(){
+  let nav = document.getElementsByTagName("nav")[0];
+  let unit = document.getElementById("unit");
+  nav.style.display = "none";
+  unit.style.display = "none";
+}
 function swapKeys() {
   let signs = document.getElementById("signs");
   let additionalSigns = document.getElementById("additionalSigns");
   let signDisplayed = window.getComputedStyle(signs).getPropertyValue("display");
   if(signDisplayed == "none") {
     signs.style.display = "grid";
-    additionalSigns.style.display = "none"
+    additionalSigns.style.display = "none";
   }else{
     signs.style.display = "none";
     additionalSigns.style.display = "grid";
@@ -70,16 +109,21 @@ function swapKeys() {
 }
 function changeUnit() {
   let unit = document.getElementsByClassName("unit");
+  let unitIndicator = document.getElementById("unit");
   if(unit[0].textContent === "DEG") {
     for(let i = 0; i < unit.length; i++) {
       unit[i].textContent = "RAD";
     }
+    unitIndicator.textContent = "RAD";
   }
   else{
     for(let i = 0; i < unit.length; i++) {
       unit[i].textContent = "DEG";
     }
+    unitIndicator.textContent = "DEG";
   }
+  hideNavs();
+  showNavs();
 }
 function showSigns(e) {
   if(e.target === e.currentTarget) {
@@ -110,12 +154,11 @@ function closeButtonTrans() {
 }
 function inputNums(e){
   let calculation = document.getElementById("calculation");
-  let calcContent = calculation.textContent;
+  let calcContent = calculation.innerHTML;
   let lastChar = calcContent[calcContent.length-1];
-  console.log(lastChar)
-  if(e.currentTarget.textContent === "DEL"){
-    logicalDelete()
-  }else if(e.currentTarget.textContent !== "=") {
+  if(e.currentTarget.textContent === "DEL" ||  e.currentTarget.textContent === "CLR"){
+    //do nothing
+  }else{
     let isSign = false;
     let isReplaceAble = false;
     for (let sign of signs){
@@ -129,26 +172,25 @@ function inputNums(e){
       }
     }
     if(lastChar === undefined){
-      console.log("is undefined");
       isReplaceAble = true;
     }
     if(isSign && !isReplaceAble){
-      calculation.textContent += e.currentTarget.textContent;
+      calculation.innerHTML += e.currentTarget.textContent;
     }else if(isSign && isReplaceAble && lastChar !== "×" && lastChar !== "–"){
-      calculation.textContent = calcContent.replace(/.$/g, e.currentTarget.textContent);
+      calculation.innerHTML = calcContent.replace(/.$/g, e.currentTarget.textContent);
     }else if(!isSign){
-      calculation.textContent += e.currentTarget.textContent;
+      calculation.innerHTML += e.currentTarget.textContent;
     }else if(isSign && lastChar === "×"){
       if (e.currentTarget.textContent === "–"){
-        calculation.textContent += e.currentTarget.textContent;
+        calculation.innerHTML += e.currentTarget.textContent;
       }else{
-        calculation.textContent = calcContent.replace(/.$/g, e.currentTarget.textContent);
+        calculation.innerHTML = calcContent.replace(/.$/g, e.currentTarget.textContent);
       }
     }else if(isSign && lastChar === "–"){
       if(calcContent.length - calcContent.lastIndexOf("×–") === 2){
-        calculation.textContent = calcContent.replace(/..$/g, e.currentTarget.textContent);
+        calculation.innerHTML = calcContent.replace(/..$/g, e.currentTarget.textContent);
       }else{
-        calculation.textContent = calcContent.replace(/.$/g, e.currentTarget.textContent);
+        calculation.innerHTML = calcContent.replace(/.$/g, e.currentTarget.textContent);
       }
     }
   }
@@ -177,14 +219,46 @@ function inputNums(e){
 }
 function inputSigns(e) {
   if (e.target === e.currentTarget) {
-    let sign = e.currentTarget.textContent;
+    let sign = e.currentTarget.innerHTML;
     let calculation = document.getElementById("calculation");
+    let calcContent = calculation.innerHTML;
     let lastChar = calculation.textContent[calculation.textContent.length-1];
     if (sign !== "INV" && sign !== "DEG" && sign !== "RAD"){
+      let isSign = false;
+      let isReplaceAble = false;
+      for (let sign of signs){
+        if(sign === e.currentTarget.textContent){
+          isSign = true;
+        }
+      }
+      for (let replaceAble of signs) {
+        if (replaceAble === lastChar){
+          isReplaceAble = true;
+        }
+      }
+      if(lastChar === undefined){
+        isReplaceAble = true;
+      }
       if(sign === "sin" || sign ===  "cos" || sign ===  "tan" || sign ===  "ln" || sign ===  "log") {
-        calculation.textContent += e.currentTarget.textContent + "(";
-      }else if(lastChar !== "^" || e.currentTarget.textContent !== "^"){
-        calculation.textContent += e.currentTarget.textContent;
+        calculation.innerHTML += e.currentTarget.textContent + "(";
+      }else if(isSign && !isReplaceAble){
+        calculation.innerHTML += e.currentTarget.textContent;
+      }else if(isSign && isReplaceAble && lastChar !== "×" && lastChar !== "–"){
+        calculation.innerHTML = calcContent.replace(/.$/g, e.currentTarget.textContent);
+      }else if(!isSign){
+        calculation.innerHTML += e.currentTarget.textContent;
+      }else if(isSign && lastChar === "×"){
+        if (e.currentTarget.textContent === "–"){
+          calculation.innerHTML += e.currentTarget.textContent;
+        }else{
+          calculation.innerHTML = calcContent.replace(/.$/g, e.currentTarget.textContent);
+        }
+      }else if(isSign && lastChar === "–"){
+        if(calcContent.length - calcContent.lastIndexOf("×–") === 2){
+          calculation.innerHTML = calcContent.replace(/..$/g, e.currentTarget.textContent);
+        }else{
+          calculation.innerHTML = calcContent.replace(/.$/g, e.currentTarget.textContent);
+        }
       }
     }
   }
@@ -215,8 +289,24 @@ function inputAdditionalSigns(e){
   if(e.target === e.currentTarget){
     let sign = e.currentTarget.innerHTML;
     let calculation = document.getElementById("calculation");
+    let calcContent = calculation.innerHTML;
     let lastChar = calculation.innerHTML[calculation.innerHTML.length-1];
     if (sign !== "INV" && sign !== "DEG" && sign !== "RAD"){
+      let isSign = false;
+      let isReplaceAble = false;
+      for (let sign of signs){
+        if(sign === e.currentTarget.textContent){
+          isSign = true;
+        }
+      }
+      for (let replaceAble of signs) {
+        if (replaceAble === lastChar){
+          isReplaceAble = true;
+        }
+      }
+      if(lastChar === undefined){
+        isReplaceAble = true;
+      }
       if(sign.match(/.+<sup>-1<\/sup>/)){
         calculation.innerHTML += sign + "(";
       }else if(sign.match(/.+<sup>x<\/sup>/) || sign === "x²"){
@@ -234,8 +324,24 @@ function inputAdditionalSigns(e){
           default:
             // code
         }
-      }else{
-        calculation.innerHTML += e.currentTarget.innerHTML;
+      }else if(isSign && !isReplaceAble){
+        calculation.innerHTML += e.currentTarget.textContent;
+      }else if(isSign && isReplaceAble && lastChar !== "×" && lastChar !== "–"){
+        calculation.innerHTML = calcContent.replace(/.$/g, e.currentTarget.textContent);
+      }else if(!isSign){
+        calculation.innerHTML += e.currentTarget.textContent;
+      }else if(isSign && lastChar === "×"){
+        if (e.currentTarget.textContent === "–"){
+          calculation.innerHTML += e.currentTarget.textContent;
+        }else{
+          calculation.innerHTML = calcContent.replace(/.$/g, e.currentTarget.textContent);
+        }
+      }else if(isSign && lastChar === "–"){
+        if(calcContent.length - calcContent.lastIndexOf("×–") === 2){
+          calculation.innerHTML = calcContent.replace(/..$/g, e.currentTarget.textContent);
+        }else{
+          calculation.innerHTML = calcContent.replace(/.$/g, e.currentTarget.textContent);
+        }
       }
     }
   }
@@ -294,7 +400,7 @@ function logicalDelete(){
           break;
         case 3:
           calculation.style.fontSize = "16vw";
-          resizeTime--
+          resizeTime--;
           break;
         default:
           calculation.style.fontSize = "20vw";
@@ -303,4 +409,55 @@ function logicalDelete(){
     }
   }
 }
-let signs = "÷×+–";
+function clearCalculation(){
+  let calculation = document.getElementById("calculation");
+  let result = document.getElementById("result");
+  calculation.innerHTML = "";
+  result.textContent = "";
+  normalizeDel();
+}
+function normalizeDel(){
+  let del = document.getElementById("del");
+  del.textContent = "DEL";
+  del.removeEventListener("click", clearCalculation);
+  del.addEventListener("click", logicalDelete);
+}
+function calculate(string) {
+  string = sanitize(string);
+  try{
+    string = eval(string);
+    return string;
+  }catch(error){
+    return error.name;
+  }
+}
+function sanitize(string) {
+  string = string.replace(/÷/g, "/");
+  string = string.replace(/×/g, "*");
+  string = string.replace(/–/g, "-");
+  string = string.replace(/\^/g, "**");
+  string = string.replace(/<sup>2<\/sup>/g, "**2");
+  return string;
+}
+function gradualResult(){
+  let calculation = document.getElementById("calculation").innerHTML;
+  let result = document.getElementById("result");
+  if(calculation !== ""){
+    let answer = calculate(calculation);
+    console.log(answer);
+    if(answer !== "SyntaxError"){
+      result.textContent = answer;
+    }
+  }
+}
+function answer(){
+  let del = document.getElementById("del");
+  del.textContent = "CLR";
+  del.removeEventListener("click", logicalDelete);
+  del.addEventListener("click", clearCalculation);
+  let calculation = document.getElementById("calculation");
+  let result = document.getElementById("result");
+  result.textContent = "";
+  let calculations = calculation.innerHTML;
+  calculation.innerHTML = calculate(calculations);
+}
