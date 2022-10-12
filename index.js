@@ -425,18 +425,77 @@ function normalizeDel(){
 function calculate(string) {
   string = sanitize(string);
   try{
-    string = eval(string);
-    return string;
+    return eval(string);
   }catch(error){
     return error.name;
   }
 }
 function sanitize(string) {
-  string = string.replace(/÷/g, "/");
+  let unit = document.getElementById("unit").textContent;
+  string = string.replace(/<sup>2<\/sup>/g, "**2");
+  string = (string.length > 1 && string.match(/%./))? string.replace(/%/g, "%×"): string;
+  string = string.replace(/%/g, "/100");
+  string = string.replace(/exp/g, "Math.exp");
+  string = (string.length > 1 && string.match(/e./) && !string.match(/ex/))? string.replace(/e/g, "e×"): string;
+  string = (string.length > 1 && string.match(/π.+/))? string.replace(/π/g, "π×"): string;
+  string = string.replace(/××/g, "*");
+  string = string.replace(/π/g, Math.PI);
+  string = (string.match(/e/) && !string.match(/ex/))? string.replace(/e/g, Math.E): string;
+  string = string.replace(/ln\(/g, "Math.LN2");
+  string = string.replace(/log/g, "Math.log");
   string = string.replace(/×/g, "*");
+  string = string.replace(/÷/g, "/");
   string = string.replace(/–/g, "-");
   string = string.replace(/\^/g, "**");
-  string = string.replace(/<sup>2<\/sup>/g, "**2");
+  let rootMatches = string.match(/√\d+(?:\.\d+)?/g);
+  if(rootMatches){
+    for (let root of rootMatches){
+      string = string.replace(root, "Math.sqrt(" + root.substring(1, root.length)+")");
+    }
+  }
+  let factorials = string.match(/\d+(?:\.\d+)?!$/g);
+  if(factorials){
+    for (let factorial of factorials){
+      string = string.replace(factorial, "nFactorial(" + factorial.substring(0, factorial.length-1)+")");
+    }
+  }
+  let arcsines = string.match(/sin<sup>-1<\/sup>\(\d+(?:\.\d+)?/g);
+  if(arcsines){
+    for (let arcsine of arcsines){
+      string = (unit === "DEG")? string.replace(arcsine, eval("toDegreeAngle(" + Math.asin(arcsine.substring(17, arcsine.length)) + ")")) : string.replace(arcsine, Math.asin(arcsine.substring(17, arcsine.length)));
+    }
+  }
+  let arcosines = string.match(/cos<sup>-1<\/sup>\(\d+(?:\.\d+)?/g);
+  if(arcosines){
+    for (let arcos of arcosines){
+      string = (unit === "DEG")? string.replace(arcos, eval( "toDegreeAngle(" + Math.acos(arcos.substring(17, arcos.length)) + ")")) : string.replace(arcos, Math.acos(arcos.substring(17, arcos.length)));
+    }
+  }
+  let arctangents = string.match(/tan<sup>-1<\/sup>\(\d+(?:\.\d+)?/g);
+  if(arctangents){
+    for (let arctangent of arctangents){
+      string = (unit === "DEG")? string.replace(arctangent, eval( "toDegreeAngle(" + Math.atan(arctangent.substring(17, arctangent.length)) + ")")) : string.replace(arctangent, Math.atan(arctangent.substring(17, arctangent.length)));
+    }
+  }
+  let sines = string.match(/sin\(\d+(?:\.\d+)?/g);
+  if(sines){
+    for (let sine of sines){
+      string = (unit === "DEG")? string.replace(sine, Math.sin(eval("toRadianAngle(" + sine.substring(4, sine.length)+")"))) : string.replace(sine, Math.sin(sine.substring(4, sine.length)));
+    }
+  }
+  let cosines = string.match(/cos\(\d+(?:\.\d+)?/g);
+  if(cosines){
+    for (let cosine of cosines){
+      string = (unit === "DEG")? string.replace(cosine, Math.cos(eval("toRadianAngle(" + cosine.substring(4, cosine.length)+")"))) : string.replace(cosine, Math.cos(cosine.substring(4, cosine.length)));
+    }
+  }
+  let tangents = string.match(/tan\(\d+(?:\.\d+)?/g);
+  if(tangents){
+    for (let tangent of tangents){
+      string = (unit === "DEG")? string.replace(tangent, Math.tan(eval("toRadianAngle(" + tangent.substring(4, tangent.length)+")"))) : string.replace(tangent, Math.tan(tangent.substring(4, tangent.length)));
+    }
+  }
+  
   return string;
 }
 function gradualResult(){
@@ -444,7 +503,6 @@ function gradualResult(){
   let result = document.getElementById("result");
   if(calculation !== ""){
     let answer = calculate(calculation);
-    console.log(answer);
     if(answer !== "SyntaxError"){
       result.textContent = answer;
     }
@@ -461,3 +519,18 @@ function answer(){
   let calculations = calculation.innerHTML;
   calculation.innerHTML = calculate(calculations);
 }
+function nFactorial(number){
+  number = Number(number);
+  if(number === null || number === NaN || number.toString().match(/\./)){
+    return "SyntaxError";
+  }
+  let counter = 1;
+  let finalAnswer = 1;
+  while (counter <=  number){
+    finalAnswer *= counter;
+    counter++;
+  }
+  return finalAnswer;
+}
+const toDegreeAngle = angle => angle * (180 / Math.PI);
+const toRadianAngle = angle => angle * (Math.PI / 180);

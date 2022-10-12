@@ -69,6 +69,7 @@ nav{
 #display{
   width: 100vw;
   height: 40vh;
+  box-shadow: inset 0 -2px 2px #000;
 }
 #buttons{
   display: grid;
@@ -95,10 +96,10 @@ nav{
 }
 #buttons p{
   display: flex;
-  justify-content: stretch;
-  align-items: stretch;
   font-size: 2.5vw;
+  border-radius: 50%;
 }
+
 sup{
   font-size: 1.7vw;
 }
@@ -112,83 +113,74 @@ sup{
   'one two three subt .'
   'point zero . plus equal';
   width: 62.5vw;
+  background: #444;
+}
+#nums > p{
+  color: #fff;
+  background: #444;
+  box-shadow: 2px 2px 2px #333, -2px -2px 2px #555;
+  margin: 2px;
+}
+#nums > p:active{
+    box-shadow: 2px 2px 2px #555, -2px -2px 2px #333;
 }
 #nums > p, #signs > p, #additionalSigns > p{
   display: flex;
-  background: #d88;
   padding: auto;
   justify-content: center;
   align-items: center;
-  margin: 0;
 }
 #nums > p:nth-child(1){
   grid-area: seven;
-  background: #;
 }
 #nums > p:nth-child(2){
   grid-area: eight;
-  background: #;
 }
 #nums > p:nth-child(3){
   grid-area: nine;
-  background: #;
 }
 #nums > p:nth-child(4){
   grid-area: division;
-  background: #;
 }
 #nums > p:nth-child(5){
   grid-area: del;
-  background: #;
 }
 #nums > p:nth-child(6){
   grid-area: four;
-  background: #;
 }
 #nums > p:nth-child(7){
   grid-area: five;
-  background: #;
 }
 #nums > p:nth-child(8){
   grid-area: six;
-  background: #;
 }
 #nums > p:nth-child(9){
   grid-area: mult;
-  background: #;
 }
 #nums > p:nth-child(10){
   grid-area: one;
-  background: #;
 }
 #nums > p:nth-child(11){
   grid-area: two;
-  background: #;
 }
 #nums > p:nth-child(12){
   grid-area: three;
-  background: #;
 }
 #nums > p:nth-child(13){
   grid-area: subt;
-  background: #;
 }
 #nums > p:nth-child(14){
   grid-area: point;
-  background: #;
 }
 #nums > p:nth-child(15){
   grid-area: zero;
-  background: #;
 }
 
 #nums > p:nth-child(16){
   grid-area: plus;
-  background: #;
 }
 #nums > p:nth-child(17){
   grid-area: equal;
-  background: #;
 }
 #signs, #additionalSigns{
   display: grid;
@@ -196,15 +188,23 @@ sup{
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
   width: 37.5vw;
   height: 60vh;
-  background: #f3f;
+  background: #ffa1ff;
 }
-
+#signs > p, #additionalSigns > p{
+  background: #ffa1ff;
+  box-shadow: 2px 2px 2px #ff91ff, -2px -2px 2px #ffb1ff;
+  margin: 2px;
+}
+#signs > p:active, #additionalSigns > p:active{
+  box-shadow: 2px 2px 2px #ffb1ff, -2px -2px 2px #ff91ff;
+}
 @keyframes swiper{
   0%{transform: translate(-3vw, 0);};
   33.3%{transform: translate(-3vw, 0);};
   66.7%{transform: translate(-3vw, 0);};
   100%{transform: translate(9vw, 0);};
 }
+
 @media only screen and (max-width:540px){
   #calculation{
     font-size: 20vw;
