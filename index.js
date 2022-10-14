@@ -34,8 +34,12 @@ window.onload = function() {
   }
   let del = document.getElementById("del");
   del.removeEventListener("click", inputNums);
-  del.removeEventListener("click",normalizeDel)
+  del.removeEventListener("click",normalizeDel);
+  del.removeEventListener("click", gradualResult)
   del.addEventListener("click", logicalDelete);
+  del.addEventListener("touchstart", prepareClear);
+  del.addEventListener("touchmove", decideClear);
+  del.addEventListener("touchend", decideClear);
   let equal = document.getElementById("equal");
   equal.removeEventListener("click", inputNums);
   equal.removeEventListener("click", normalizeDel);
@@ -114,13 +118,13 @@ function changeUnit() {
     for(let i = 0; i < unit.length; i++) {
       unit[i].textContent = "RAD";
     }
-    unitIndicator.textContent = "RAD";
+    unitIndicator.textContent = "DEG";
   }
   else{
     for(let i = 0; i < unit.length; i++) {
       unit[i].textContent = "DEG";
     }
-    unitIndicator.textContent = "DEG";
+    unitIndicator.textContent = "RAD";
   }
   hideNavs();
   showNavs();
@@ -408,10 +412,28 @@ function logicalDelete(){
       }
     }
   }
+  gradualResult();
+}
+function prepareClear(e) {
+  let time = new Date().getTime();
+  e.currentTarget.setAttribute("time", JSON.stringify(time));
+}
+function decideClear(e){
+  let newTime = new Date().getTime();
+  let oldTime = JSON.parse(e.currentTarget.getAttribute("time"));
+  let calculation = document.getElementById("calculation").innerHTML;
+  if(newTime - oldTime > 500 && calculation !== ""){
+    clearCalculation();
+  }
 }
 function clearCalculation(){
   let calculation = document.getElementById("calculation");
   let result = document.getElementById("result");
+  let display = document.getElementById("display");
+  display.style.animation = "cleaner 0.5s ease-out";
+  setTimeout(function() {
+    display.style.animation = "";
+  }, 500);
   calculation.innerHTML = "";
   result.textContent = "";
   normalizeDel();
@@ -438,11 +460,50 @@ function sanitize(string) {
   string = string.replace(/exp/g, "Math.exp");
   string = (string.length > 1 && string.match(/e./) && !string.match(/ex/))? string.replace(/e/g, "e×"): string;
   string = (string.length > 1 && string.match(/π.+/))? string.replace(/π/g, "π×"): string;
-  string = string.replace(/××/g, "*");
   string = string.replace(/π/g, Math.PI);
   string = (string.match(/e/) && !string.match(/ex/))? string.replace(/e/g, Math.E): string;
-  string = string.replace(/ln\(/g, "Math.LN2");
-  string = string.replace(/log/g, "Math.log");
+  string = string.replace(/log/g, "Math.log10");
+  string = string.replace(/ln/g, "Math.log");
+  let beforeRoots = string.match(/.√/g);
+  if(beforeRoots){
+    let change = true;
+    for( let root of beforeRoots){
+      for (let sign of signs){
+        if (sign === root[0]){
+          beforeRoots = beforeRoots.splice(beforeRoots.indexOf(root), 1);
+          change = false;
+          break;
+        }
+      }
+    }
+    if (change){
+      for(let root of beforeRoots){
+        string = string.replace(root, root[0] + "×√");
+      }
+    }
+  }
+  let afterClosingBrackets = string.match(/\)./g);
+  if(afterClosingBrackets){
+    let change = true;
+    for( let bracket of afterClosingBrackets){
+      for (let sign of signs){
+        if (sign === bracket[1]){
+          afterClosingBrackets = afterClosingBrackets.splice(afterClosingBrackets.indexOf(bracket), 1);
+          change = false;
+          break;
+        }
+      }
+      if (bracket[1] === ")"){
+        afterClosingBrackets = afterClosingBrackets.splice(afterClosingBrackets.indexOf(bracket), 1);
+      }
+    }
+    if (change){
+      for(let bracket of afterClosingBrackets){
+        string = string.replace(bracket, ")×" + bracket[1]);
+      }
+    }
+  }
+  string = string.replace(/××+/g, "*");
   string = string.replace(/×/g, "*");
   string = string.replace(/÷/g, "/");
   string = string.replace(/–/g, "-");
@@ -459,43 +520,43 @@ function sanitize(string) {
       string = string.replace(factorial, "nFactorial(" + factorial.substring(0, factorial.length-1)+")");
     }
   }
-  let arcsines = string.match(/sin<sup>-1<\/sup>\(\d+(?:\.\d+)?/g);
+  let arcsines = string.match(/sin<sup>-1<\/sup>/g);
   if(arcsines){
     for (let arcsine of arcsines){
-      string = (unit === "DEG")? string.replace(arcsine, eval("toDegreeAngle(" + Math.asin(arcsine.substring(17, arcsine.length)) + ")")) : string.replace(arcsine, Math.asin(arcsine.substring(17, arcsine.length)));
+      string = string.replace(arcsine, "asine");
     }
   }
-  let arcosines = string.match(/cos<sup>-1<\/sup>\(\d+(?:\.\d+)?/g);
+  let arcosines = string.match(/cos<sup>-1<\/sup>/g);
   if(arcosines){
     for (let arcos of arcosines){
-      string = (unit === "DEG")? string.replace(arcos, eval( "toDegreeAngle(" + Math.acos(arcos.substring(17, arcos.length)) + ")")) : string.replace(arcos, Math.acos(arcos.substring(17, arcos.length)));
+      string = string.replace(arcos, "acosine");
     }
   }
-  let arctangents = string.match(/tan<sup>-1<\/sup>\(\d+(?:\.\d+)?/g);
+  let arctangents = string.match(/tan<sup>-1<\/sup>/g);
   if(arctangents){
     for (let arctangent of arctangents){
-      string = (unit === "DEG")? string.replace(arctangent, eval( "toDegreeAngle(" + Math.atan(arctangent.substring(17, arctangent.length)) + ")")) : string.replace(arctangent, Math.atan(arctangent.substring(17, arctangent.length)));
+      string = string.replace(arctangent,  "atangent");
     }
   }
-  let sines = string.match(/sin\(\d+(?:\.\d+)?/g);
+  let sines = string.match(/sin\(/g);
   if(sines){
     for (let sine of sines){
-      string = (unit === "DEG")? string.replace(sine, Math.sin(eval("toRadianAngle(" + sine.substring(4, sine.length)+")"))) : string.replace(sine, Math.sin(sine.substring(4, sine.length)));
+      string = string.replace(sine, "sin(");
     }
   }
-  let cosines = string.match(/cos\(\d+(?:\.\d+)?/g);
+  let cosines = string.match(/cos\(/g);
   if(cosines){
     for (let cosine of cosines){
-      string = (unit === "DEG")? string.replace(cosine, Math.cos(eval("toRadianAngle(" + cosine.substring(4, cosine.length)+")"))) : string.replace(cosine, Math.cos(cosine.substring(4, cosine.length)));
+      string = string.replace(cosine, "cos(");
     }
   }
-  let tangents = string.match(/tan\(\d+(?:\.\d+)?/g);
+  let tangents = string.match(/tan\(/g);
   if(tangents){
     for (let tangent of tangents){
-      string = (unit === "DEG")? string.replace(tangent, Math.tan(eval("toRadianAngle(" + tangent.substring(4, tangent.length)+")"))) : string.replace(tangent, Math.tan(tangent.substring(4, tangent.length)));
+      string = string.replace(tangent, "tan(");
     }
   }
-  
+  string = balanceBracket(string);
   return string;
 }
 function gradualResult(){
@@ -503,21 +564,27 @@ function gradualResult(){
   let result = document.getElementById("result");
   if(calculation !== ""){
     let answer = calculate(calculation);
-    if(answer !== "SyntaxError"){
+    if(answer.toString().match(/\d+/)){
       result.textContent = answer;
     }
+  }else{
+    result.textContent = "";
   }
 }
 function answer(){
   let del = document.getElementById("del");
-  del.textContent = "CLR";
-  del.removeEventListener("click", logicalDelete);
-  del.addEventListener("click", clearCalculation);
   let calculation = document.getElementById("calculation");
   let result = document.getElementById("result");
   result.textContent = "";
   let calculations = calculation.innerHTML;
-  calculation.innerHTML = calculate(calculations);
+  if(/\d+/.test(calculate(calculations))){
+    del.textContent = "CLR";
+    del.removeEventListener("click", logicalDelete);
+    del.addEventListener("click", clearCalculation);
+    calculation.innerHTML = calculate(calculations);
+  }else{
+    result.textContent = "Bad expression";
+  }
 }
 function nFactorial(number){
   number = Number(number);
@@ -534,3 +601,52 @@ function nFactorial(number){
 }
 const toDegreeAngle = angle => angle * (180 / Math.PI);
 const toRadianAngle = angle => angle * (Math.PI / 180);
+function asine(string){
+  let unit = document.getElementById("unit").textContent;
+  let angle = Math.asin(string);
+  angle = (unit === "DEG")? toDegreeAngle(string) : angle;
+  return angle;
+}
+function acosine(string){
+  let unit = document.getElementById("unit").textContent;
+  let angle = Math.acos(string);
+  angle = (unit === "DEG")? toDegreeAngle(string) : angle;
+  return angle;
+}
+function atangent(string){
+  let unit = document.getElementById("unit").textContent;
+  let angle = Math.atan(string);
+  angle = (unit === "DEG")? toDegreeAngle(string) : angle;
+  return angle;
+}
+function sin(string){
+  let unit = document.getElementById("unit").textContent;
+  let angle = (unit === "DEG")? toDegreeAngle(string) : string;
+  return Math.sin(angle);
+}
+function cos(string){
+  let unit = document.getElementById("unit").textContent;
+  let angle = (unit === "DEG")? toDegreeAngle(string) : string;
+  return Math.cos(angle);
+}
+function tan(string){
+  let unit = document.getElementById("unit").textContent;
+  let angle = (unit === "DEG")? toDegreeAngle(string) : string;
+  return Math.tan(angle);
+}
+function balanceBracket(string){
+  let opens;
+  let closes;
+  try{
+    opens = string.match(/\(/g).length;
+    closes = string.match(/\)/g).length;
+  }catch(e){}
+  if(typeof(opens) === "number"){
+    closes = (typeof(closes) === "number")? closes: 0;
+    let requiredBrackets = opens - closes;
+    for (let i = 0; i < requiredBrackets; i++){
+      string += ")";
+    }
+  }
+  return string;
+}

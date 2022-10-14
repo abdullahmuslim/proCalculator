@@ -1,4 +1,5 @@
 body{
+  --bg: #fff;
   height: 100vh;
   width: 100vw;
   box-sizing: border-box;
@@ -29,6 +30,9 @@ nav{
   flex-direction: column;
   justify-content: center;
   align-items: right;
+  width: 100vw;
+  height: 40vh;
+  background: #fff;
 }
 #calculation{
   display: flex;
@@ -65,11 +69,6 @@ nav{
   grid-template-rows: 0.4fr 0.6fr;
   height: 100vh;
   width: 100vw;
-}
-#display{
-  width: 100vw;
-  height: 40vh;
-  box-shadow: inset 0 -2px 2px #000;
 }
 #buttons{
   display: grid;
@@ -119,7 +118,7 @@ sup{
   color: #fff;
   background: #444;
   box-shadow: 2px 2px 2px #333, -2px -2px 2px #555;
-  margin: 2px;
+  margin: 3px;
 }
 #nums > p:active{
     box-shadow: 2px 2px 2px #555, -2px -2px 2px #333;
@@ -195,6 +194,9 @@ sup{
   box-shadow: 2px 2px 2px #ff91ff, -2px -2px 2px #ffb1ff;
   margin: 2px;
 }
+#additionalSigns > p:first-child{
+  background: #cc81cc;
+}
 #signs > p:active, #additionalSigns > p:active{
   box-shadow: 2px 2px 2px #ffb1ff, -2px -2px 2px #ff91ff;
 }
@@ -203,6 +205,24 @@ sup{
   33.3%{transform: translate(-3vw, 0);};
   66.7%{transform: translate(-3vw, 0);};
   100%{transform: translate(9vw, 0);};
+}
+@keyframes cleaner{
+  0%{
+    background: radial-gradient(circle at bottom right, #7c8cff 0%, transparent 7%);
+  }
+  10%{
+    background: radial-gradient(circle at bottom right, #7c8cff 10%, transparent 17%);
+  }
+  20%{
+    background: radial-gradient(circle at bottom right, #7c8cff 20%, transparent 27%);
+  }
+  33.3%{
+    background: radial-gradient(circle at bottom right, #7c8cff 33%, transparent 40%);
+  }
+  66.7%{
+    background: radial-gradient(circle at bottom right, #7c8cff 66%, transparent 73%);
+  }
+  100%{background: #7c8cff;};
 }
 
 @media only screen and (max-width:540px){
@@ -225,7 +245,7 @@ sup{
   #swipeNotify{
     right: 0;
     padding: 2vw;
-    animation: swiper 0.7s linear infinite;
+    animation: swiper 0.5s linear infinite;
   }
   #buttons p{
     font-size: 8vw;
