@@ -430,7 +430,7 @@ function clearCalculation(){
   let calculation = document.getElementById("calculation");
   let result = document.getElementById("result");
   let display = document.getElementById("display");
-  display.style.animation = "cleaner 0.5s ease-out";
+  display.style.animation = "cleaner 0.5s ease-in";
   setTimeout(function() {
     display.style.animation = "";
   }, 500);
@@ -447,7 +447,11 @@ function normalizeDel(){
 function calculate(string) {
   string = sanitize(string);
   try{
-    return eval(string);
+    string = eval(string);
+    console.log(string, typeof(string), string.length)
+    string = (string.toString().length > 12)? Number(string).toPrecision(12) : string;
+    string = (/e\+/.test(string.toString())? string.toString().replace(/e\+/, "E") : string);
+    return string;
   }catch(error){
     return error.name;
   }

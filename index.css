@@ -11,6 +11,7 @@ p{
   align-items: center;
 }
 #unit{
+  z-index: 1;
   color: #555;
   position: fixed;
   top: 0;
@@ -19,6 +20,7 @@ p{
   width: 10vw;
 }
 nav{
+  z-index: 1;
   position: fixed;
   top: 0;
   right: 0;
@@ -57,7 +59,8 @@ nav{
   top: 23vh;
   right: 0;
   text-align: right;
-  font-size: 2.5vw;
+  font-size: 5vw;
+  font-weight: 100;
   padding: 4vw;
   width: auto;
 }
@@ -208,19 +211,35 @@ sup{
 }
 @keyframes cleaner{
   0%{
-    background: radial-gradient(circle at bottom right, #7c8cff 0%, transparent 7%);
+    background: radial-gradient(circle at 80vw bottom, #7c8cff 0%, transparent 0%);
   }
   10%{
-    background: radial-gradient(circle at bottom right, #7c8cff 10%, transparent 17%);
+    background: radial-gradient(circle at 80vw bottom, #7c8cff 10%, transparent 10%);
   }
   20%{
-    background: radial-gradient(circle at bottom right, #7c8cff 20%, transparent 27%);
+    background: radial-gradient(circle at 80vw bottom, #7c8cff 20%, transparent 20%);
   }
-  33.3%{
-    background: radial-gradient(circle at bottom right, #7c8cff 33%, transparent 40%);
+  30%{
+    background: radial-gradient(circle at 80vw bottom, #7c8cff 30%, transparent 30%);
   }
-  66.7%{
-    background: radial-gradient(circle at bottom right, #7c8cff 66%, transparent 73%);
+  40%{
+    background: radial-gradient(circle at 80vw bottom, #7c8cff 40%, transparent 40%);
+  }
+  50%{
+    background: radial-gradient(circle at 80vw bottom, #7c8cff 50%, transparent 50%);
+  }
+  60%{
+    background: radial-gradient(circle at 80vw bottom, #7c8cff 60%, transparent 60%);
+  }
+  70%{
+    background: radial-gradient(circle at 80vw bottom, #7c8cff 70%, transparent 70%);
+  }
+  80%{
+    background: radial-gradient(circle at 80vw bottom, #7c8cff 80%, transparent 80%);
+  }
+  90%{
+    background: radial-gradient(circle at 80vw bottom, #7c8cff 90%, transparent 90%);
+    background-color: #7c8cff;
   }
   100%{background: #7c8cff;};
 }
