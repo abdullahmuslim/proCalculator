@@ -1,9 +1,7 @@
 body{
-  --bg: #fff;
   height: 100vh;
   width: 100vw;
   box-sizing: border-box;
-  overflow-x: hidden;
 }
 p{
   display: flex;
@@ -30,8 +28,9 @@ nav{
 #display{
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: right;
+  justify-content: flex-start;
+  align-items: flex-end;
+  grid-template-rows: 1fr 1fr;
   width: 100vw;
   height: 40vh;
   background: #fff;
@@ -39,16 +38,17 @@ nav{
 #calculation{
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
+  white-space: nowrap;
   color: #222;
   position: fixed;
-  top: 8vh;
+  top: 5vh;
   right: 0;
   text-align: right;
   font-weight: 300;
   max-height: 1em;
   padding: 4vw;
   font-size: 5vw;
+  overflow-x: auto;
 }
 #calculation *{
   display: inline;
@@ -56,13 +56,12 @@ nav{
 #result{
   color: #555;
   position: fixed;
-  top: 23vh;
+  top: 19vh;
   right: 0;
   text-align: right;
   font-size: 5vw;
   font-weight: 100;
   padding: 4vw;
-  width: auto;
 }
 #interface{
   position: fixed;
@@ -246,6 +245,7 @@ sup{
 
 @media only screen and (max-width:540px){
   #calculation{
+    top: 8vh;
     font-size: 20vw;
     font-weight: 300;
   }
@@ -253,6 +253,7 @@ sup{
     font-size: 10vw;
   }
   #result{
+    top: 23vh;
     font-size: 10vw;
   }
   #buttonTrans{

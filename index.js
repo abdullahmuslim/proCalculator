@@ -71,12 +71,14 @@ window.onresize = function() {
     for(let i = 0; i < signs.length; i++) {
       signs[i].style.right = "0";
     }
+    document.getElementById("calculation").style.fontSize = "5vw";
   }else{
     portrait = true;
     let signs = document.getElementsByClassName("signs");
     for(let i = 0; i < signs.length; i++) {
       signs[i].style.right = "-70vw";
     }
+    document.getElementById("calculation").style.fontSize = "18vw";
   }
 }
 function showNavs(){
@@ -198,28 +200,8 @@ function inputNums(e){
       }
     }
   }
-  if(portrait && resizeTime < 3) {
-    let width = window.getComputedStyle(calculation).getPropertyValue("width").replace("px", "");
-    if(width > window.screen.availWidth){
-      switch (resizeTime) {
-        case 0:
-          calculation.style.fontSize = "18vw";
-          resizeTime++;
-          break;
-        case 1:
-          calculation.style.fontSize = "16vw";
-          resizeTime++;
-          break;
-        case 2:
-          calculation.style.fontSize = "14vw";
-          resizeTime++
-          break;
-        default:
-          calculation.style.fontSize = "20vw";
-          resizeTime = 0;
-      }
-    }
-  }
+  calculationResizer();
+  calculation.innerHTML = clarify(calculation.innerHTML);
 }
 function inputSigns(e) {
   if (e.target === e.currentTarget) {
@@ -266,28 +248,8 @@ function inputSigns(e) {
       }
     }
   }
-  if(portrait && resizeTime < 3) {
-    let width = window.getComputedStyle(calculation).getPropertyValue("width").replace("px", "");
-    if(width > window.screen.availWidth){
-      switch (resizeTime) {
-        case 0:
-          calculation.style.fontSize = "18vw";
-          resizeTime++;
-          break;
-        case 1:
-          calculation.style.fontSize = "16vw";
-          resizeTime++;
-          break;
-        case 2:
-          calculation.style.fontSize = "14vw";
-          resizeTime++
-          break;
-        default:
-          calculation.style.fontSize = "20vw";
-          resizeTime = 0;
-      }
-    }
-  }
+  calculationResizer();
+  calculation.innerHTML = clarify(calculation.innerHTML);
 }
 function inputAdditionalSigns(e){
   if(e.target === e.currentTarget){
@@ -324,9 +286,6 @@ function inputAdditionalSigns(e){
           case "e<sup>x</sup>":
             calculation.innerHTML += "exp(";
             break;
-          
-          default:
-            // code
         }
       }else if(isSign && !isReplaceAble){
         calculation.innerHTML += e.currentTarget.textContent;
@@ -349,28 +308,8 @@ function inputAdditionalSigns(e){
       }
     }
   }
-  if(portrait && resizeTime < 3) {
-    let width = window.getComputedStyle(calculation).getPropertyValue("width").replace("px", "");
-    if(width > window.screen.availWidth){
-      switch (resizeTime) {
-        case 0:
-          calculation.style.fontSize = "18vw";
-          resizeTime++;
-          break;
-        case 1:
-          calculation.style.fontSize = "16vw";
-          resizeTime++;
-          break;
-        case 2:
-          calculation.style.fontSize = "14vw";
-          resizeTime++
-          break;
-        default:
-          calculation.style.fontSize = "20vw";
-          resizeTime = 0;
-      }
-    }
-  }
+  calculationResizer();
+  calculation.innerHTML = clarify(calculation.innerHTML);
 }
 function logicalDelete(){
   let calculation = document.getElementById("calculation");
@@ -413,6 +352,7 @@ function logicalDelete(){
     }
   }
   gradualResult();
+  calculation.innerHTML = clarify(calculation.innerHTML);
 }
 function prepareClear(e) {
   let time = new Date().getTime();
@@ -436,6 +376,7 @@ function clearCalculation(){
   }, 500);
   calculation.innerHTML = "";
   result.textContent = "";
+  calculation.style.fontSize = (portrait)? "18vw":"5vw";
   normalizeDel();
 }
 function normalizeDel(){
@@ -448,7 +389,6 @@ function calculate(string) {
   string = sanitize(string);
   try{
     string = eval(string);
-    console.log(string, typeof(string), string.length)
     string = (string.toString().length > 12)? Number(string).toPrecision(12) : string;
     string = (/e\+/.test(string.toString())? string.toString().replace(/e\+/, "E") : string);
     return string;
@@ -458,6 +398,7 @@ function calculate(string) {
 }
 function sanitize(string) {
   let unit = document.getElementById("unit").textContent;
+  string = string.replace(/,/g, "");
   string = string.replace(/<sup>2<\/sup>/g, "**2");
   string = (string.length > 1 && string.match(/%./))? string.replace(/%/g, "%×"): string;
   string = string.replace(/%/g, "/100");
@@ -566,7 +507,8 @@ function sanitize(string) {
 function gradualResult(){
   let calculation = document.getElementById("calculation").innerHTML;
   let result = document.getElementById("result");
-  if(calculation !== ""){
+  let calculatable = (Number(calculation))? false : true;
+  if(calculation !== "" && calculatable){
     let answer = calculate(calculation);
     if(answer.toString().match(/\d+/)){
       result.textContent = answer;
@@ -574,6 +516,7 @@ function gradualResult(){
   }else{
     result.textContent = "";
   }
+  result.textContent = clarify(result.textContent);
 }
 function answer(){
   let del = document.getElementById("del");
@@ -585,7 +528,9 @@ function answer(){
     del.textContent = "CLR";
     del.removeEventListener("click", logicalDelete);
     del.addEventListener("click", clearCalculation);
+    calculation.style.fontSize = (portrait)? "11vw":"5vw";
     calculation.innerHTML = calculate(calculations);
+    calculation.innerHTML = clarify(calculation.innerHTML);
   }else{
     result.textContent = "Bad expression";
   }
@@ -650,6 +595,52 @@ function balanceBracket(string){
     let requiredBrackets = opens - closes;
     for (let i = 0; i < requiredBrackets; i++){
       string += ")";
+    }
+  }
+  return string;
+}
+function calculationResizer(){
+  if(portrait && resizeTime < 3) {
+    let width = window.getComputedStyle(calculation).getPropertyValue("width").replace("px", "");
+    if(width > window.screen.availWidth){
+      switch (resizeTime) {
+        case 0:
+          calculation.style.fontSize = "16vw";
+          resizeTime++;
+          break;
+        case 1:
+          calculation.style.fontSize = "14vw";
+          resizeTime++;
+          break;
+        case 2:
+          calculation.style.fontSize = "12vw";
+          resizeTime++
+          break;
+        default:
+          calculation.style.fontSize = "18vw";
+          resizeTime = 0;
+      }
+    }
+  }
+}
+function clarify(string){
+  string = string.replace(/,/g, "");
+  let clarifiables = string.match(/\d+(?:\.\d+)?(?:E\d+)?/g);
+  for (let clarifiable of clarifiables){
+    let intPart = clarifiable.match(/\d+/)[0];
+    intPart = intPart.toString();
+    if(intPart.length > 3){
+      for(let i = 0; ; i++){
+        lastComma = intPart.indexOf(",");
+        lastComma = (i === 0)? intPart.length : lastComma;
+        if(lastComma > 3){
+          intPart = intPart.substr(0, lastComma-3) + "," + intPart.substr(lastComma-3, intPart.length);
+        }else{
+          let newClarifiable = clarifiable.replace(/\d+/, intPart);
+          string = string.replace(clarifiable, newClarifiable);
+          break;
+        }
+      }
     }
   }
   return string;
